@@ -4,17 +4,16 @@ from transformers import pipeline
 st.title("Starbucks Review Sentiment Analysis")
 
 st.write(
-    "This app analyzes Starbucks customer reviews using two Hugging Face pipelines: "
-    "review summarization and sentiment classification."
+    "This app analyzes Starbucks customer reviews using Hugging Face models."
 )
 
-# Pipeline 1: Sentiment Analysis using Hugging Face model
+# Sentiment Analysis Pipeline
 sentiment_pipeline = pipeline(
     "text-classification",
     model="distilbert-base-uncased-finetuned-sst-2-english"
 )
 
-# Pipeline 2: Review Summarization using Hugging Face model
+# Summarization Pipeline
 summary_pipeline = pipeline(
     "summarization",
     model="facebook/bart-large-cnn"
@@ -31,6 +30,7 @@ if st.button("Analyze"):
         st.warning("Please enter a review.")
 
     else:
+
         if len(review.split()) < 20:
             summary_text = review
         else:
@@ -40,6 +40,7 @@ if st.button("Analyze"):
                 min_length=8,
                 do_sample=False
             )
+
             summary_text = summary_result[0]["summary_text"]
 
         sentiment_result = sentiment_pipeline(review)
@@ -53,17 +54,19 @@ if st.button("Analyze"):
         st.subheader("Sentiment Result")
 
         if label == "POSITIVE":
-            st.write("Prediction: Positive")
-            st.write(f"Confidence: {score:.2f}")
+
             st.success("Positive Review")
+            st.write(f"Confidence Score: {score:.2f}")
+
             st.info(
                 "Business Suggestion: Maintain current service quality and customer experience."
             )
 
         else:
-            st.write("Prediction: Negative")
-            st.write(f"Confidence: {score:.2f}")
+
             st.error("Negative Review")
+            st.write(f"Confidence Score: {score:.2f}")
+
             st.info(
                 "Business Suggestion: Review customer complaints and improve service quality."
             )
