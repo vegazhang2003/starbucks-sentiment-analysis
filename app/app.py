@@ -7,13 +7,11 @@ st.write(
     "This app analyzes Starbucks customer reviews using Hugging Face models."
 )
 
-# Sentiment Analysis Pipeline
 sentiment_pipeline = pipeline(
     "text-classification",
     model="distilbert-base-uncased-finetuned-sst-2-english"
 )
 
-# Summarization Pipeline
 summary_pipeline = pipeline(
     "summarization",
     model="facebook/bart-large-cnn"
