@@ -5,19 +5,17 @@ st.title("Starbucks Review Sentiment Analysis")
 
 st.write(
     "This app analyzes Starbucks customer reviews using two Hugging Face pipelines: "
-    "sentiment classification and short business suggestion generation."
+    "sentiment classification and emotion classification."
 )
 
-# Pipeline 1: Sentiment classification
 sentiment_pipeline = pipeline(
     "text-classification",
     model="distilbert-base-uncased-finetuned-sst-2-english"
 )
 
-# Pipeline 2: Text generation for business suggestion
-suggestion_pipeline = pipeline(
-    "text2text-generation",
-    model="google/flan-t5-small"
+emotion_pipeline = pipeline(
+    "text-classification",
+    model="bhadresh-savani/distilbert-base-uncased-emotion"
 )
 
 review = st.text_area(
@@ -32,30 +30,28 @@ if st.button("Analyze"):
 
     else:
         sentiment_result = sentiment_pipeline(review)
+        emotion_result = emotion_pipeline(review)
 
-        label = sentiment_result[0]["label"]
-        score = sentiment_result[0]["score"]
+        sentiment_label = sentiment_result[0]["label"]
+        sentiment_score = sentiment_result[0]["score"]
 
-        suggestion_prompt = (
-            "Give one short business suggestion for this Starbucks customer review: "
-            + review
-        )
-
-        suggestion_result = suggestion_pipeline(
-            suggestion_prompt,
-            max_new_tokens=40
-        )
-
-        suggestion = suggestion_result[0]["generated_text"]
+        emotion_label = emotion_result[0]["label"]
+        emotion_score = emotion_result[0]["score"]
 
         st.subheader("Sentiment Result")
 
-        if label == "POSITIVE":
+        if sentiment_label == "POSITIVE":
             st.success("Positive Review")
+            suggestion = "Maintain current service quality and customer experience."
         else:
             st.error("Negative Review")
+            suggestion = "Review customer complaints and improve service quality."
 
-        st.write(f"Confidence Score: {score:.2f}")
+        st.write(f"Confidence Score: {sentiment_score:.2f}")
+
+        st.subheader("Emotion Result")
+        st.write(f"Detected Emotion: {emotion_label}")
+        st.write(f"Emotion Confidence Score: {emotion_score:.2f}")
 
         st.subheader("Business Suggestion")
         st.info(suggestion)
