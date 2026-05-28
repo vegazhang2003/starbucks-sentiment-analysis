@@ -8,19 +8,22 @@ st.write(
     "review summarization and sentiment classification."
 )
 
-# Pipeline 1: Sentiment Analysis using fine-tuned DistilBERT
+# Pipeline 1: Sentiment Analysis using Hugging Face model
 sentiment_pipeline = pipeline(
     "text-classification",
-    model="../models/starbucks_sentiment_model"
+    model="distilbert-base-uncased-finetuned-sst-2-english"
 )
 
-# Pipeline 2: Summarization using Hugging Face pre-trained model
+# Pipeline 2: Review Summarization using Hugging Face model
 summary_pipeline = pipeline(
     "summarization",
     model="facebook/bart-large-cnn"
 )
 
-review = st.text_area("Enter a Starbucks customer review:")
+review = st.text_area(
+    "Enter a Starbucks customer review:",
+    height=200
+)
 
 if st.button("Analyze"):
 
@@ -28,13 +31,12 @@ if st.button("Analyze"):
         st.warning("Please enter a review.")
 
     else:
-        # For very short reviews, summarization may not work well.
         if len(review.split()) < 20:
             summary_text = review
         else:
             summary_result = summary_pipeline(
                 review,
-                max_length=35,
+                max_length=30,
                 min_length=8,
                 do_sample=False
             )
@@ -50,13 +52,18 @@ if st.button("Analyze"):
 
         st.subheader("Sentiment Result")
 
-        if label == "LABEL_1":
+        if label == "POSITIVE":
             st.write("Prediction: Positive")
             st.write(f"Confidence: {score:.2f}")
             st.success("Positive Review")
-            st.info("Business Suggestion: Maintain current service quality and customer experience.")
+            st.info(
+                "Business Suggestion: Maintain current service quality and customer experience."
+            )
+
         else:
             st.write("Prediction: Negative")
             st.write(f"Confidence: {score:.2f}")
             st.error("Negative Review")
-            st.info("Business Suggestion: Review customer complaints and improve service quality.")
+            st.info(
+                "Business Suggestion: Review customer complaints and improve service quality."
+            )
